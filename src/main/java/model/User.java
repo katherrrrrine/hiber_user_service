@@ -74,10 +74,5 @@ public class User {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
-
-    @Override
-    public String toString() {
-        return String.format("User{id=%d, name='%s', email='%s', age=%d, createdAt=%s}",
-                id, name, email, age, createdAt);
-    }
+    
 }

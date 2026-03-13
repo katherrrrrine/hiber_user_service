@@ -1,13 +1,13 @@
 package dao;
 
-import dto.UserDto;
+import model.User;
 import java.util.List;
 import java.util.Optional;
 
 public interface UserDao {
-    UserDto save(UserDto userDto);
-    Optional<UserDto> findById(Long id);
-    List<UserDto> findAll();
-    UserDto update(UserDto userDto);
+    User save(User user);
+    Optional<User> findById(Long id);
+    List<User> findAll();
+    User update(User user);
     void delete(Long id);
 }

@@ -1,10 +1,10 @@
 import console.ConsoleHelper;
-import dao.UserDao;
 import dao.UserDaoImpl;
 import dto.UserDto;
 import exception.UserDaoException;
 import exception.UserNotFoundException;
 import exception.ValidationException;
+import service.UserService;
 import util.HibernateUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,7 +16,7 @@ import java.util.Optional;
 public class Main {
 
     private static final Logger logger = LogManager.getLogger(Main.class);
-    private static final UserDao userDao = new UserDaoImpl();
+    private static final UserService userService = new UserService(new UserDaoImpl());
     private static final ConsoleHelper console = new ConsoleHelper();
 
     public static void main(String[] args) {
@@ -96,7 +96,7 @@ public class Main {
         userDto.setEmail(email);
         userDto.setAge(age);
 
-        UserDto savedUser = userDao.save(userDto);
+        UserDto savedUser = userService.createUser(userDto);
         console.printSuccess("Пользователь успешно создан с ID: " + savedUser.getId());
         logger.info("User created with ID: {}", savedUser.getId());
     }
@@ -105,7 +105,7 @@ public class Main {
         console.printInfo("Поиск пользователя по ID");
 
         long id = console.getIdInput("Введите ID пользователя: ");
-        Optional<UserDto> userOpt = userDao.findById(id);
+        Optional<UserDto> userOpt = userService.findUserById(id);
 
         if (userOpt.isPresent()) {
             UserDto user = userOpt.get();
@@ -118,7 +118,7 @@ public class Main {
     private static void findAllUsers() {
         console.printInfo("Список всех пользователей");
 
-        List<UserDto> users = userDao.findAll();
+        List<UserDto> users = userService.findAllUsers();
 
         if (users.isEmpty()) {
             console.printInfo("Пользователей нет");
@@ -134,7 +134,7 @@ public class Main {
         console.printInfo("Обновление пользователя");
 
         long id = console.getIdInput("Введите ID пользователя для обновления: ");
-        Optional<UserDto> userOpt = userDao.findById(id);
+        Optional<UserDto> userOpt = userService.findUserById(id);
 
         if (userOpt.isPresent()) {
             UserDto user = userOpt.get();
@@ -172,7 +172,7 @@ public class Main {
                 }
             }
 
-            UserDto updatedUser = userDao.update(user);
+            UserDto updatedUser = userService.updateUser(user);
             console.printSuccess("Пользователь обновлен");
             printUserDetails(updatedUser);
 
@@ -186,7 +186,7 @@ public class Main {
 
         long id = console.getIdInput("Введите ID пользователя для удаления: ");
 
-        Optional<UserDto> userOpt = userDao.findById(id);
+        Optional<UserDto> userOpt = userService.findUserById(id);
         if (userOpt.isPresent()) {
             UserDto user = userOpt.get();
             System.out.println("Будет удален:");
@@ -194,7 +194,7 @@ public class Main {
 
             String confirm = console.getStringInput("Подтвердите удаление (y/n): ");
             if (confirm.equalsIgnoreCase("y") || confirm.equalsIgnoreCase("yes")) {
-                userDao.delete(id);
+                userService.deleteUser(id);
                 console.printSuccess("Пользователь с ID " + id + " удален");
                 logger.info("User deleted with ID: {}", id);
             } else {
@@ -218,6 +218,5 @@ public class Main {
                 user.getName(),
                 user.getEmail(),
                 user.getAge());
-
     }
 }
